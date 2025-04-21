@@ -36,7 +36,7 @@ The **Anchor Escrow 2025** program acts as a trusted intermediary, releasing tok
 Verify your local environment with:
 
 ```bash
-echo "Solana CLI: $(solana -V)\nAnchor: $(anchor --version)\nNode: $(node --version)\nRust: $(rustc -V)"
+npm run show-versions
 ```
 
 This repository was tested with:
