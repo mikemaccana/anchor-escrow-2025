@@ -47,8 +47,6 @@ jobs:
         run: |
           solana-keygen new --no-bip39-passphrase
 
-      # This commit removed the RUSTUP_TOOLCHAIN fix
-
       - name: Test the project builds and tests pass
         run: |
           echo "Creating a keypair..."
