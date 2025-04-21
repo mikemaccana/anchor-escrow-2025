@@ -68,7 +68,7 @@ Using different versions may cause compatibility issues.
 3. Run tests:
 
    ```bash
-   anchor test
+   RUSTUP_TOOLCHAIN=nightly-2025-04-16 anchor test
    ```
 
 4. Deploy the program:

@@ -47,6 +47,21 @@ jobs:
         run: |
           solana-keygen new --no-bip39-passphrase
 
+      # RUSTUP_TOOLCHAIN fix is for
+      #
+      #       error[E0599]: no method named `file` found for reference `&proc_macro::Span` in the current scope
+      #    --> /Users/mike/.cargo/registry/src/index.crates.io-6f17d22bba15001f/proc-macro2-1.0.95/src/wrapper.rs:465:36
+      #     |
+      # 465 |             Span::Compiler(s) => s.file(),
+      #     |                                    ^^^^ method not found in `&Span`
+
+      # error[E0599]: no method named `local_file` found for reference `&proc_macro::Span` in the current scope
+      #    --> /Users/mike/.cargo/registry/src/index.crates.io-6f17d22bba15001f/proc-macro2-1.0.95/src/wrapper.rs:473:36
+      #     |
+      # 473 |             Span::Compiler(s) => s.local_file(),
+      #     |                                    ^^^^^^^^^^ method not found in `&Span`
+      # TODO: remove this when no longer needed
+
       - name: Test the project builds and tests pass
         run: |
           echo "Creating a keypair..."
@@ -57,6 +72,7 @@ jobs:
           npm i
           echo "----------------------------------------"
           echo "Running 'anchor test'..."
+          export RUSTUP_TOOLCHAIN='nightly-2025-04-16'
           anchor test 2>&1 | tee -a build.log
           echo "----------------------------------------"
           echo "build.log..."
