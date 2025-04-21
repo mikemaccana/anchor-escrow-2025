@@ -27,19 +27,6 @@ jobs:
         run: |
           git config --global init.defaultBranch main
 
-      - name: Print versions and debugging info
-        run: |
-          echo Linux version:
-          lsb_release -a
-          echo Solana version:
-          solana -V
-          echo Anchor version:
-          anchor -V
-          echo build-sbf version:
-          cargo build-sbf --version
-          echo Path:
-          echo $PATH | tr ':' '\n' | sort
-
       # Fixes:
       #   Error: Unable to read keypair file
       # during 'anchor test'
@@ -49,6 +36,10 @@ jobs:
 
       - name: Test the project builds and tests pass
         run: |
+          echo "----------------------------------------"
+          echo "Showing versions..."
+          npm run show-versions
+          echo "----------------------------------------"
           echo "Creating a keypair..."
           solana-keygen new --no-bip39-passphrase -s -o deleteme.json
           echo SECRET_KEY="$(cat deleteme.json)"> .env

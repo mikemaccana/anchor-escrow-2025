@@ -6,7 +6,7 @@
     "test": "anchor test",
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
-    "show-versions": "echo \"Solana CLI: $(solana -V)\nAnchor: $(anchor --version)\nNode: $(node --version)\nRust: $(rustc -V)\""
+    "show-versions": "bash show-versions.sh"
   },
   "license": "MIT",
   "devDependencies": {
