@@ -3,7 +3,7 @@ name: Builds and passes tests with 0 warnings or errors
 
 on:
   push:
-    branches: [main]
+    branches: [main, broken-anchor-0-31-1]
   pull_request:
     branches: [main]
 
