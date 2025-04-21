@@ -43,9 +43,9 @@ This repository was tested with:
 
 ```
 Solana CLI: solana-cli 2.1.0 (src:c1080de4; feat:3176011155, client:Agave)
-Anchor: anchor-cli 0.31.0
+Anchor: anchor-cli 0.31.1
 Node: v22.11.0
-Rust: rustc 1.82.0 (f6e511eec 2024-10-15)
+Rust: rustc 1.86.0 (05f9846f8 2025-03-31)
 ```
 
 Using different versions may cause compatibility issues.
