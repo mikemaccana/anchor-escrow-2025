@@ -1,75 +1,16 @@
 import { before, describe, test, it } from "node:test";
 import assert from "node:assert";
 import * as programClient from "../dist/js-client";
+import { OFFER_DISCRIMINATOR } from "../dist/js-client";
 import { connect, Connection, SOL, TOKEN_EXTENSIONS_PROGRAM, ErrorWithTransaction } from "solana-kite";
 import { lamports, type KeyPairSigner, type Address } from "@solana/kit";
-
-// For debugging. You could delete these, but then someone else will have to recreate them and then they'll be annoyed with you.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const log = console.log;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const stringify = (object: any) => {
-  const bigIntReplacer = (key: string, value: any) => (typeof value === "bigint" ? value.toString() : value);
-  return JSON.stringify(object, bigIntReplacer, 2);
-};
-
-const ONE_SOL = lamports(1n * SOL);
-
-const getRandomBigInt = () => {
-  return BigInt(Math.floor(Math.random() * 1_000_000_000_000_000_000));
-};
+import bs58 from "bs58";
+import { createTestOffer, getRandomBigInt, ONE_SOL, log, stringify, getOffers } from "./escrow.test-helpers";
 
 const INSUFFICIENT_FUNDS_ERROR = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb.TransferChecked: insufficient funds";
 const REFUND_OFFER_ERROR =
   "8jR5GeNzeweq35Uo84kGP3v1NcBaZWH5u62k7PxN4T2y.RefundOffer: A has one constraint was violated";
 const ACCOUNT_IN_USE_ERROR = "11111111111111111111111111111111.Allocate: account already in use";
-
-// Helper function to create a test offer
-async function createTestOffer(params: {
-  connection: Connection;
-  maker: KeyPairSigner;
-  tokenMintA: Address;
-  tokenMintB: Address;
-  makerTokenAccountA: Address;
-  tokenAOfferedAmount: bigint;
-  tokenBWantedAmount: bigint;
-  offerId?: bigint;
-}) {
-  const {
-    connection,
-    maker,
-    tokenMintA,
-    tokenMintB,
-    makerTokenAccountA,
-    tokenAOfferedAmount,
-    tokenBWantedAmount,
-    offerId = getRandomBigInt(),
-  } = params;
-
-  const offerPDAAndBump = await connection.getPDAAndBump(programClient.ESCROW_PROGRAM_ADDRESS, ["offer", offerId]);
-  const offer = offerPDAAndBump.pda;
-  const vault = await connection.getTokenAccountAddress(offer, tokenMintA, true);
-
-  const makeOfferInstruction = await programClient.getMakeOfferInstructionAsync({
-    maker,
-    tokenMintA,
-    tokenMintB,
-    makerTokenAccountA,
-    offer,
-    vault,
-    id: offerId,
-    tokenAOfferedAmount,
-    tokenBWantedAmount,
-    tokenProgram: TOKEN_EXTENSIONS_PROGRAM,
-  });
-
-  const signature = await connection.sendTransactionFromInstructions({
-    feePayer: maker,
-    instructions: [makeOfferInstruction],
-  });
-
-  return { offer, vault, offerId, signature };
-}
 
 describe("Escrow", () => {
   let connection: Connection;
@@ -218,6 +159,29 @@ describe("Escrow", () => {
           error.message === INSUFFICIENT_FUNDS_ERROR,
           `Expected "${INSUFFICIENT_FUNDS_ERROR}" but got: ${error.message}`,
         );
+      }
+    });
+  });
+
+  describe("can get all the offers", () => {
+    test("successfully gets all offers", async () => {
+      const offers = await getOffers(connection);
+
+      log(`offers`, stringify(offers));
+
+      // Assert there's one offer
+      assert.ok(offers.length === 1, "Expected to get one offer");
+
+      const offer = offers[0];
+      assert.ok(offer.exists, "Offer account should exist");
+      if (offer.exists) {
+        assert.equal(offer.address, offer.address, "Offer address should match");
+        assert.equal(offer.data.maker, alice.address, "Maker address should match");
+        assert.equal(offer.data.tokenMintA, tokenMintA, "tokenMintA should match");
+        assert.equal(offer.data.tokenMintB, tokenMintB, "tokenMintB should match");
+        assert.equal(offer.data.tokenBWantedAmount, tokenBWantedAmount.toString(), "tokenBWantedAmount should match");
+        assert.ok(typeof offer.data.bump === "number", "Bump should be a number");
+        assert.ok(offer.data.discriminator, "Discriminator should exist");
       }
     });
   });
