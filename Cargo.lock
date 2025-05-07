@@ -636,7 +636,6 @@ version = "1.0.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "proc-macro2",
 ]
 
 [[package]]
